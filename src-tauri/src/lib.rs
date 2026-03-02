@@ -6,7 +6,7 @@ mod panel;
 mod panel_windows;
 mod plugin_engine;
 #[cfg(target_os = "macos")]
-mod tray;
+mod tray_macos;
 #[cfg(not(target_os = "macos"))]
 mod tray_windows;
 #[cfg(target_os = "macos")]
@@ -14,6 +14,8 @@ mod webkit_config;
 
 #[cfg(not(target_os = "macos"))]
 use panel_windows as panel;
+#[cfg(target_os = "macos")]
+use tray_macos as tray;
 #[cfg(not(target_os = "macos"))]
 use tray_windows as tray;
 
