@@ -30,11 +30,17 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Fail-fast Rust compile check (Windows target)
-        run: cargo check --manifest-path src-tauri/Cargo.toml --target x86_64-pc-windows-msvc
-
       - name: Bundle plugins
         run: bun run bundle:plugins
+
+      - name: Ensure bundled plugin resource dir exists
+        run: |
+          if (!(Test-Path "src-tauri/resources/bundled_plugins")) {
+            New-Item -ItemType Directory -Path "src-tauri/resources/bundled_plugins" | Out-Null
+          }
+
+      - name: Fail-fast Rust compile check (Windows target)
+        run: cargo check --manifest-path src-tauri/Cargo.toml --target x86_64-pc-windows-msvc
 
       - name: Build unsigned Windows preview
         run: bunx tauri build --config src-tauri/tauri.windows.conf.json --target x86_64-pc-windows-msvc --bundles nsis
