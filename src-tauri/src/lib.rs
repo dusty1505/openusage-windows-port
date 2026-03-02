@@ -4,6 +4,7 @@ mod app_nap;
 mod panel;
 #[cfg(not(target_os = "macos"))]
 mod panel_windows;
+mod panel_api;
 mod plugin_engine;
 #[cfg(target_os = "macos")]
 mod tray_macos;
@@ -12,8 +13,6 @@ mod tray_windows;
 #[cfg(target_os = "macos")]
 mod webkit_config;
 
-#[cfg(not(target_os = "macos"))]
-use panel_windows as panel;
 #[cfg(target_os = "macos")]
 use tray_macos as tray;
 #[cfg(not(target_os = "macos"))]
@@ -105,7 +104,7 @@ fn managed_shortcut_slot() -> &'static Mutex<Option<String>> {
 fn handle_global_shortcut(app: &tauri::AppHandle, event: tauri_plugin_global_shortcut::ShortcutEvent) {
     if event.state == ShortcutState::Pressed {
         log::debug!("Global shortcut triggered");
-        panel::toggle_panel(app);
+        panel_api::toggle(app);
     }
 }
 
@@ -167,24 +166,12 @@ pub struct ProbeBatchComplete {
 
 #[tauri::command]
 fn init_panel(app_handle: tauri::AppHandle) {
-    panel::init(&app_handle).expect("Failed to initialize panel");
+    panel_api::init(&app_handle).expect("Failed to initialize panel");
 }
 
 #[tauri::command]
 fn hide_panel(app_handle: tauri::AppHandle) {
-    #[cfg(target_os = "macos")]
-    {
-        use tauri_nspanel::ManagerExt;
-        if let Ok(panel) = app_handle.get_webview_panel("main") {
-            panel.hide();
-            return;
-        }
-    }
-
-    #[cfg(not(target_os = "macos"))]
-    {
-        panel::hide_panel(&app_handle);
-    }
+    panel_api::hide(&app_handle);
 }
 
 #[tauri::command]

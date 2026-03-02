@@ -51,6 +51,14 @@ pub fn toggle_panel(app_handle: &AppHandle) {
     }
 }
 
+pub fn hide_panel(app_handle: &AppHandle) {
+    if let Ok(panel) = app_handle.get_webview_panel("main") {
+        panel.hide();
+    } else {
+        log::debug!("hide_panel: panel handle not found");
+    }
+}
+
 // Define our panel class and event handler together
 tauri_panel! {
     panel!(OpenUsagePanel {
