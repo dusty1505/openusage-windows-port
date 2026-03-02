@@ -17,6 +17,11 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -24,6 +29,9 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+
+      - name: Fail-fast Rust compile check (Windows target)
+        run: cargo check --manifest-path src-tauri/Cargo.toml --target x86_64-pc-windows-msvc
 
       - name: Bundle plugins
         run: bun run bundle:plugins
