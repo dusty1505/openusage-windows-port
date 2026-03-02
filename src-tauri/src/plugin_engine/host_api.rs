@@ -953,6 +953,10 @@ fn inject_ls<'js>(ctx: &Ctx<'js>, host: &Object<'js>, plugin_id: &str) -> rquick
                     opts.markers
                 );
 
+                if cfg!(target_os = "windows") {
+                    return Ok(unsupported_on_windows_mvp("process_inspection", "ls._discoverRaw"));
+                }
+
                 let ps_output = match std::process::Command::new("/bin/ps")
                     .args(["-ax", "-o", "pid=,command="])
                     .output()
