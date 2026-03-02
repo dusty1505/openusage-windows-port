@@ -1900,6 +1900,9 @@ fn inject_sqlite<'js>(ctx: &Ctx<'js>, host: &Object<'js>) -> rquickjs::Result<()
         Function::new(
             ctx.clone(),
             move |ctx_inner: Ctx<'_>, db_path: String, sql: String| -> rquickjs::Result<String> {
+                if cfg!(target_os = "windows") {
+                    return Ok(unsupported_on_windows_mvp("sqlite_shell", "sqlite.query"));
+                }
                 if sql.lines().any(|line| line.trim_start().starts_with('.')) {
                     return Err(Exception::throw_message(
                         &ctx_inner,
@@ -1958,6 +1961,12 @@ fn inject_sqlite<'js>(ctx: &Ctx<'js>, host: &Object<'js>) -> rquickjs::Result<()
         Function::new(
             ctx.clone(),
             move |ctx_inner: Ctx<'_>, db_path: String, sql: String| -> rquickjs::Result<()> {
+                if cfg!(target_os = "windows") {
+                    return Err(Exception::throw_message(
+                        &ctx_inner,
+                        unsupported_on_windows_mvp("sqlite_shell", "sqlite.exec").as_str(),
+                    ));
+                }
                 if sql.lines().any(|line| line.trim_start().starts_with('.')) {
                     return Err(Exception::throw_message(
                         &ctx_inner,
