@@ -146,6 +146,19 @@ fn redact_value(value: &str) -> String {
 }
 
 /// Redact sensitive query parameters in URL
+fn unsupported_on_windows_mvp(feature: &str, operation: &str) -> String {
+    serde_json::json!({
+        "ok": false,
+        "status": "unsupported_on_windows_mvp",
+        "feature": feature,
+        "operation": operation,
+        "reason": "This operation is not available on Windows in preview builds.",
+        "hint": "Planned for Phase 2 backend support.",
+        "value": serde_json::Value::Null
+    })
+    .to_string()
+}
+
 fn redact_url(url: &str) -> String {
     let sensitive_params = [
         "key",
@@ -1773,7 +1786,7 @@ fn inject_keychain<'js>(ctx: &Ctx<'js>, host: &Object<'js>) -> rquickjs::Result<
                 if !cfg!(target_os = "macos") {
                     return Err(Exception::throw_message(
                         &ctx_inner,
-                        "keychain API is only supported on macOS",
+                        unsupported_on_windows_mvp("keychain", "readGenericPassword").as_str(),
                     ));
                 }
                 let output = std::process::Command::new("security")
@@ -1808,7 +1821,7 @@ fn inject_keychain<'js>(ctx: &Ctx<'js>, host: &Object<'js>) -> rquickjs::Result<
                 if !cfg!(target_os = "macos") {
                     return Err(Exception::throw_message(
                         &ctx_inner,
-                        "keychain API is only supported on macOS",
+                        unsupported_on_windows_mvp("keychain", "writeGenericPassword").as_str(),
                     ));
                 }
 
