@@ -1,0 +1,38 @@
+name: windows-preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - windows-port/**
+
+jobs:
+  build-windows-preview:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.22
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Bundle plugins
+        run: bun run bundle:plugins
+
+      - name: Build unsigned Windows preview
+        run: bunx tauri build --target x86_64-pc-windows-msvc --bundles nsis
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openusage-windows-preview
+          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/**

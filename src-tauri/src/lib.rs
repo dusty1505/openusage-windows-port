@@ -1,10 +1,21 @@
 #[cfg(target_os = "macos")]
 mod app_nap;
+#[cfg(target_os = "macos")]
 mod panel;
+#[cfg(not(target_os = "macos"))]
+mod panel_windows;
 mod plugin_engine;
+#[cfg(target_os = "macos")]
 mod tray;
+#[cfg(not(target_os = "macos"))]
+mod tray_windows;
 #[cfg(target_os = "macos")]
 mod webkit_config;
+
+#[cfg(not(target_os = "macos"))]
+use panel_windows as panel;
+#[cfg(not(target_os = "macos"))]
+use tray_windows as tray;
 
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
@@ -159,9 +170,18 @@ fn init_panel(app_handle: tauri::AppHandle) {
 
 #[tauri::command]
 fn hide_panel(app_handle: tauri::AppHandle) {
-    use tauri_nspanel::ManagerExt;
-    if let Ok(panel) = app_handle.get_webview_panel("main") {
-        panel.hide();
+    #[cfg(target_os = "macos")]
+    {
+        use tauri_nspanel::ManagerExt;
+        if let Ok(panel) = app_handle.get_webview_panel("main") {
+            panel.hide();
+            return;
+        }
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        panel::hide_panel(&app_handle);
     }
 }
 
@@ -299,10 +319,10 @@ async fn start_probe_batch(
 
 #[tauri::command]
 fn get_log_path(app_handle: tauri::AppHandle) -> Result<String, String> {
-    // macOS log directory: ~/Library/Logs/{bundleIdentifier}
-    let home = dirs::home_dir().ok_or("no home dir")?;
-    let bundle_id = app_handle.config().identifier.clone();
-    let log_dir = home.join("Library").join("Logs").join(&bundle_id);
+    let log_dir = app_handle
+        .path()
+        .app_log_dir()
+        .map_err(|e| format!("failed to resolve log dir: {e}"))?;
     let log_file = log_dir.join(format!("{}.log", app_handle.package_info().name));
     Ok(log_file.to_string_lossy().to_string())
 }
@@ -416,11 +436,10 @@ pub fn run() {
     let runtime = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
     let _guard = runtime.enter();
 
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_aptabase::Builder::new("A-US-6435241436").build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::default().build())
-        .plugin(tauri_nspanel::init())
         .plugin(
             tauri_plugin_log::Builder::new()
                 .targets([
@@ -437,7 +456,14 @@ pub fn run() {
         )
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_autostart::Builder::new().build())
+        .plugin(tauri_plugin_autostart::Builder::new().build());
+
+    #[cfg(target_os = "macos")]
+    {
+        builder = builder.plugin(tauri_nspanel::init());
+    }
+
+    builder
         .invoke_handler(tauri::generate_handler![
             init_panel,
             hide_panel,
