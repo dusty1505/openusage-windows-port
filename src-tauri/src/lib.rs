@@ -424,7 +424,13 @@ fn list_plugins(state: tauri::State<'_, Mutex<AppState>>) -> Vec<PluginMeta> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let runtime = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
+    let runtime = match tokio::runtime::Runtime::new() {
+        Ok(runtime) => runtime,
+        Err(err) => {
+            eprintln!("Failed to create Tokio runtime: {}", err);
+            return;
+        }
+    };
     let _guard = runtime.enter();
 
     let mut builder = tauri::Builder::default()
@@ -454,7 +460,7 @@ pub fn run() {
         builder = builder.plugin(tauri_nspanel::init());
     }
 
-    builder
+    let app = match builder
         .invoke_handler(tauri::generate_handler![
             init_panel,
             hide_panel,
@@ -481,8 +487,8 @@ pub fn run() {
 
             track_app_started_once_per_day_per_version(app);
 
-            let app_data_dir = app.path().app_data_dir().expect("no app data dir");
-            let resource_dir = app.path().resource_dir().expect("no resource dir");
+            let app_data_dir = app.path().app_data_dir()?;
+            let resource_dir = app.path().resource_dir()?;
             log::debug!("app_data_dir: {:?}", app_data_dir);
 
             let (_, plugins) = plugin_engine::initialize_plugins(&app_data_dir, &resource_dir);
@@ -530,8 +536,15 @@ pub fn run() {
             Ok(())
         })
         .build(tauri::generate_context!())
-        .expect("error while building tauri application")
-        .run(|_, _| {});
+    {
+        Ok(app) => app,
+        Err(err) => {
+            eprintln!("error while building tauri application: {}", err);
+            return;
+        }
+    };
+
+    app.run(|_, _| {});
 }
 
 #[cfg(test)]
