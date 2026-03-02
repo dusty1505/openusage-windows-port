@@ -2,6 +2,9 @@
   "app": {
     "macOSPrivateApi": false
   },
+  "bundle": {
+    "createUpdaterArtifacts": false
+  },
   "plugins": {
     "updater": {
       "pubkey": "",
