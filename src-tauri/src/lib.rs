@@ -373,7 +373,13 @@ fn update_global_shortcut(app_handle: tauri::AppHandle, shortcut: Option<String>
 #[tauri::command]
 fn list_plugins(state: tauri::State<'_, Mutex<AppState>>) -> Vec<PluginMeta> {
     let plugins = {
-        let locked = state.lock().expect("plugin state poisoned");
+        let locked = match state.lock() {
+            Ok(locked) => locked,
+            Err(err) => {
+                log::error!("list_plugins: plugin state poisoned: {}", err);
+                return Vec::new();
+            }
+        };
         locked.plugins.clone()
     };
     log::debug!("list_plugins: {} plugins", plugins.len());
@@ -388,7 +394,7 @@ fn list_plugins(state: tauri::State<'_, Mutex<AppState>>) -> Vec<PluginMeta> {
                 .iter()
                 .filter(|line| line.line_type == "progress" && line.primary_order.is_some())
                 .collect();
-            candidates.sort_by_key(|line| line.primary_order.unwrap());
+            candidates.sort_by_key(|line| line.primary_order.unwrap_or(u32::MAX));
             let primary_candidates: Vec<String> =
                 candidates.iter().map(|line| line.label.clone()).collect();
 
