@@ -166,7 +166,9 @@ pub struct ProbeBatchComplete {
 
 #[tauri::command]
 fn init_panel(app_handle: tauri::AppHandle) {
-    panel_api::init(&app_handle).expect("Failed to initialize panel");
+    if let Err(err) = panel_api::init(&app_handle) {
+        log::warn!("init_panel degraded: {}", err);
+    }
 }
 
 #[tauri::command]
