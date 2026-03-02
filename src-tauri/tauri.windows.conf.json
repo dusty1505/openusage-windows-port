@@ -1,5 +1,11 @@
 {
   "app": {
     "macOSPrivateApi": false
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "",
+      "endpoints": []
+    }
   }
 }
