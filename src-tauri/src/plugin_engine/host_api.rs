@@ -61,11 +61,13 @@ fn shell_from_env() -> Option<String> {
     }
 }
 
+#[cfg(not(target_os = "windows"))]
 fn read_env_from_interactive_shell(program: &str, name: &str) -> Option<String> {
     let script = format!("printenv {}", name);
     read_env_value_via_command(program, &["-ilc", script.as_str()])
 }
 
+#[cfg(not(target_os = "windows"))]
 fn read_env_from_interactive_shells(name: &str) -> Option<String> {
     let mut programs: Vec<String> = Vec::new();
 
@@ -94,6 +96,12 @@ fn read_env_from_interactive_shells(name: &str) -> Option<String> {
     None
 }
 
+#[cfg(target_os = "windows")]
+fn read_env_from_powershell(name: &str) -> Option<String> {
+    let script = format!("[Environment]::GetEnvironmentVariable('{}')", name);
+    read_env_value_via_command("powershell", &["-NoProfile", "-Command", script.as_str()])
+}
+
 fn resolve_env_value(name: &str) -> Option<String> {
     // Prefer the current process env (fast + supports launchctl/terminal-launch).
     if let Some(value) = read_env_from_process(name) {
@@ -106,7 +114,12 @@ fn resolve_env_value(name: &str) -> Option<String> {
         }
     }
 
+    #[cfg(target_os = "windows")]
+    let resolved = read_env_from_powershell(name);
+
+    #[cfg(not(target_os = "windows"))]
     let resolved = read_env_from_interactive_shells(name);
+
     if let Ok(mut cache) = terminal_env_cache().lock() {
         cache.insert(name.to_string(), resolved.clone());
     }
