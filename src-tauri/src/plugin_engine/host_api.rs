@@ -1317,46 +1317,83 @@ fn ccusage_home_override<'a>(
     }
 }
 
+#[cfg(target_os = "windows")]
+fn windows_runner_cmd_variants(bin: &str) -> [String; 2] {
+    [format!("{}.cmd", bin), bin.to_string()]
+}
+
 fn ccusage_runner_candidates(kind: CcusageRunnerKind) -> Vec<String> {
     let mut candidates: Vec<String> = Vec::new();
-    match kind {
-        CcusageRunnerKind::Bunx => {
-            if let Some(home) = dirs::home_dir() {
-                candidates.push(home.join(".bun/bin/bunx").to_string_lossy().to_string());
+
+    #[cfg(target_os = "windows")]
+    {
+        let bin = match kind {
+            CcusageRunnerKind::Bunx => "bunx",
+            CcusageRunnerKind::PnpmDlx => "pnpm",
+            CcusageRunnerKind::YarnDlx => "yarn",
+            CcusageRunnerKind::NpmExec => "npm",
+            CcusageRunnerKind::Npx => "npx",
+        };
+
+        if let Some(home) = dirs::home_dir() {
+            for variant in windows_runner_cmd_variants(bin) {
+                candidates.push(home.join(".bun/bin").join(&variant).to_string_lossy().to_string());
+                candidates.push(home.join("AppData/Roaming/npm").join(&variant).to_string_lossy().to_string());
             }
-            candidates.extend(
-                ["/opt/homebrew/bin/bunx", "/usr/local/bin/bunx", "bunx"]
-                    .into_iter()
-                    .map(str::to_string),
-            );
         }
-        CcusageRunnerKind::PnpmDlx => {
-            candidates.extend(
-                ["/opt/homebrew/bin/pnpm", "/usr/local/bin/pnpm", "pnpm"]
-                    .into_iter()
-                    .map(str::to_string),
-            );
+
+        if let Some(local) = std::env::var_os("LOCALAPPDATA") {
+            let local = PathBuf::from(local);
+            for variant in windows_runner_cmd_variants(bin) {
+                candidates.push(local.join("Programs/Bun/bin").join(&variant).to_string_lossy().to_string());
+                candidates.push(local.join("Programs/npm").join(&variant).to_string_lossy().to_string());
+            }
         }
-        CcusageRunnerKind::YarnDlx => {
-            candidates.extend(
-                ["/opt/homebrew/bin/yarn", "/usr/local/bin/yarn", "yarn"]
-                    .into_iter()
-                    .map(str::to_string),
-            );
-        }
-        CcusageRunnerKind::NpmExec => {
-            candidates.extend(
-                ["/opt/homebrew/bin/npm", "/usr/local/bin/npm", "npm"]
-                    .into_iter()
-                    .map(str::to_string),
-            );
-        }
-        CcusageRunnerKind::Npx => {
-            candidates.extend(
-                ["/opt/homebrew/bin/npx", "/usr/local/bin/npx", "npx"]
-                    .into_iter()
-                    .map(str::to_string),
-            );
+
+        candidates.extend(windows_runner_cmd_variants(bin));
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        match kind {
+            CcusageRunnerKind::Bunx => {
+                if let Some(home) = dirs::home_dir() {
+                    candidates.push(home.join(".bun/bin/bunx").to_string_lossy().to_string());
+                }
+                candidates.extend(
+                    ["/opt/homebrew/bin/bunx", "/usr/local/bin/bunx", "bunx"]
+                        .into_iter()
+                        .map(str::to_string),
+                );
+            }
+            CcusageRunnerKind::PnpmDlx => {
+                candidates.extend(
+                    ["/opt/homebrew/bin/pnpm", "/usr/local/bin/pnpm", "pnpm"]
+                        .into_iter()
+                        .map(str::to_string),
+                );
+            }
+            CcusageRunnerKind::YarnDlx => {
+                candidates.extend(
+                    ["/opt/homebrew/bin/yarn", "/usr/local/bin/yarn", "yarn"]
+                        .into_iter()
+                        .map(str::to_string),
+                );
+            }
+            CcusageRunnerKind::NpmExec => {
+                candidates.extend(
+                    ["/opt/homebrew/bin/npm", "/usr/local/bin/npm", "npm"]
+                        .into_iter()
+                        .map(str::to_string),
+                );
+            }
+            CcusageRunnerKind::Npx => {
+                candidates.extend(
+                    ["/opt/homebrew/bin/npx", "/usr/local/bin/npx", "npx"]
+                        .into_iter()
+                        .map(str::to_string),
+                );
+            }
         }
     }
 
@@ -1377,6 +1414,19 @@ fn ccusage_path_entries_with(home: Option<&Path>, existing_path: Option<&OsStr>)
         entries.push(home.join(".bun/bin"));
         entries.push(home.join(".nvm/current/bin"));
         entries.push(home.join(".local/bin"));
+        #[cfg(target_os = "windows")]
+        {
+            entries.push(home.join("AppData/Roaming/npm"));
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        if let Some(local) = std::env::var_os("LOCALAPPDATA") {
+            let local = PathBuf::from(local);
+            entries.push(local.join("Programs/Bun/bin"));
+            entries.push(local.join("Programs/npm"));
+        }
     }
 
     entries.extend(
