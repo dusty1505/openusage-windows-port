@@ -1,6 +1,14 @@
 {
   "app": {
-    "macOSPrivateApi": false
+    "macOSPrivateApi": false,
+    "windows": [
+      {
+        "label": "main",
+        "decorations": true,
+        "resizable": true,
+        "transparent": false
+      }
+    ]
   },
   "bundle": {
     "createUpdaterArtifacts": false

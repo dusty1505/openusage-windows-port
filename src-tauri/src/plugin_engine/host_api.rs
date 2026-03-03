@@ -5,6 +5,12 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::{Mutex, OnceLock};
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+
 const WHITELISTED_ENV_VARS: [&str; 6] = [
     "CODEX_HOME",
     "ZAI_API_KEY",
@@ -32,8 +38,17 @@ fn read_env_from_process(name: &str) -> Option<String> {
     }
 }
 
+fn apply_windows_no_window(command: &mut Command) {
+    #[cfg(target_os = "windows")]
+    {
+        command.creation_flags(CREATE_NO_WINDOW);
+    }
+}
+
 fn read_env_value_via_command(program: &str, args: &[&str]) -> Option<String> {
-    let output = Command::new(program).args(args).output().ok()?;
+    let mut command = Command::new(program);
+    apply_windows_no_window(&mut command);
+    let output = command.args(args).output().ok()?;
     if !output.status.success() {
         return None;
     }
@@ -1470,6 +1485,7 @@ fn ccusage_enriched_path() -> Option<OsString> {
 
 fn ccusage_runner_available(candidate: &str, enriched_path: Option<&OsStr>) -> bool {
     let mut command = std::process::Command::new(candidate);
+    apply_windows_no_window(&mut command);
     command.arg("--version");
     if let Some(path) = enriched_path {
         command.env("PATH", path);
@@ -1486,6 +1502,7 @@ fn configure_ccusage_command(
     args: &[String],
     enriched_path: Option<&OsStr>,
 ) {
+    apply_windows_no_window(command);
     command.args(args);
     if let Some(path) = enriched_path {
         command.env("PATH", path);
