@@ -10,7 +10,7 @@ pub fn create(app_handle: &AppHandle) -> tauri::Result<()> {
     let menu = Menu::with_items(app_handle, &[&show_stats, &quit])?;
 
     TrayIconBuilder::with_id("tray")
-        .tooltip("OpenUsage")
+        .tooltip("UsageForge")
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(move |app_handle, event| match event.id.as_ref() {
