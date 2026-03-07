@@ -1,18 +1,20 @@
-# Track all your AI coding subscriptions in one place
+# UsageForge
+
+Track all your AI coding subscriptions in one place.
 
 See your usage at a glance from your menu bar. No digging through dashboards.
 
-![OpenUsage Screenshot](screenshot.png)
+![UsageForge Screenshot](screenshot.png)
+
+> UsageForge is an independent fork inspired by [OpenUsage](https://github.com/robinebers/openusage) by Robin Ebers. UsageForge is not affiliated with or endorsed by OpenUsage.
 
 ## Download
 
-[**Download the latest release**](https://github.com/robinebers/openusage/releases/latest) (macOS, Apple Silicon & Intel)
-
-The app auto-updates. Install once and you're set.
+[**Download the latest release**](https://github.com/dusty1505/openusage-windows-port/releases/latest)
 
 ## What It Does
 
-OpenUsage lives in your menu bar and shows you how much of your AI coding subscriptions you've used. Progress bars, badges, and clear labels. No mental math required.
+UsageForge lives in your menu bar and shows you how much of your AI coding subscriptions you've used. Progress bars, badges, and clear labels. No mental math required.
 
 - **One glance.** All your AI tools, one panel.
 - **Always up-to-date.** Refreshes automatically on a schedule you pick.
@@ -38,16 +40,16 @@ OpenUsage lives in your menu bar and shows you how much of your AI coding subscr
 
 ### Maybe Soon
 
-- [Vercel AI Gateway](https://github.com/robinebers/openusage/issues/18)
+- [Vercel AI Gateway](https://github.com/dusty1505/openusage-windows-port/issues)
 
 Community contributions welcome.
-Want a provider that's not listed? [Open an issue.](https://github.com/robinebers/openusage/issues/new)
+Want a provider that's not listed? [Open an issue.](https://github.com/dusty1505/openusage-windows-port/issues/new)
 
 ## Open Source, Community Driven
 
-OpenUsage is built by its users. Hundreds of people use it daily, and the project grows through community contributions: new providers, bug fixes, and ideas.
+UsageForge is built by its users and maintainers. Contributions are welcome: new providers, bug fixes, and ideas.
 
-I maintain the project as a guide and quality gatekeeper, but this is your app as much as mine. If something is missing or broken, the best way to get it fixed is to contribute by opening an issue, or submitting a PR.
+If something is missing or broken, the best way to get it fixed is to open an issue or submit a PR.
 
 Plugins are currently bundled as we build our the API, but soon will be made flexible so you can build and load their own.
 
@@ -55,7 +57,7 @@ Plugins are currently bundled as we build our the API, but soon will be made fle
 
 - **Add a provider.** Each one is just a plugin. See the [Plugin API](docs/plugins/api.md).
 - **Fix a bug.** PRs welcome. Provide before/after screenshots.
-- **Request a feature.** [Open an issue](https://github.com/robinebers/openusage/issues/new) and make your case.
+- **Request a feature.** [Open an issue](https://github.com/dusty1505/openusage-windows-port/issues/new) and make your case.
 
 Keep it simple. No feature creep, no AI-generated commit messages, test your changes.
 
@@ -63,15 +65,11 @@ Keep it simple. No feature creep, no AI-generated commit messages, test your cha
 
 Not a single line of code in this project was read or written by hand. 100% AI-generated, AI-reviewed, AI-shipped — using [Cursor](https://cursor.com), [Claude Code](https://docs.anthropic.com/en/docs/claude-code), and [Codex CLI](https://github.com/openai/codex).
 
-OpenUsage is a real-world example of what I teach in the [AI Builder's Blueprint](https://itsbyrob.in/EBDqgJ6) — a proven process for building and shipping software with AI, no coding background required.
+OpenUsage is the upstream project this fork is inspired by. UsageForge focuses on a Windows-friendly fork path with independent maintenance.
 
-## Sponsors
+## Sponsorship
 
-OpenUsage is supported by our sponsors. Become a sponsor to get your logo here and on [openusage.ai](https://openusage.ai).
-
-[Become a Sponsor](https://github.com/sponsors/robinebers)
-
-<!-- Add sponsor logos here -->
+If you want to support UsageForge development, open an issue in this repository and we can coordinate sponsorship options.
 
 ## Credits
 

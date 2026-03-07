@@ -5,9 +5,9 @@ This is the exact flow used to get the Windows preview build running.
 ## 1) Download and install preview build
 
 1. Open Actions run artifacts for a successful `windows-preview` run.
-2. Download artifact: `openusage-windows-preview`.
+2. Download artifact: `usageforge-windows-preview`.
 3. Extract zip.
-4. Run installer: `OpenUsage_0.6.8_x64-setup.exe`.
+4. Run installer: `UsageForge_0.6.8_x64-setup.exe` (or the latest UsageForge installer name).
 
 ## 2) Install Node.js (required for Codex/Gemini CLIs)
 
@@ -45,7 +45,7 @@ cd $HOME
 gemini.cmd
 ```
 
-## 5) Refresh OpenUsage UI
+## 5) Refresh UsageForge UI
 
 In app, click refresh and confirm providers show usage instead of "Not logged in".
 

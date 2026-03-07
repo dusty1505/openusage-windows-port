@@ -79,25 +79,20 @@ export function AboutDialog({ version, onClose }: AboutDialogProps) {
 
         <div className="text-sm text-muted-foreground space-y-1">
           <p>
-            Built by{" "}
-            <ExternalLink href="https://itsbyrob.in/x">Robin Ebers</ExternalLink>
+            UsageForge is an independent fork inspired by{" "}
+            <ExternalLink href="https://github.com/robinebers/openusage">OpenUsage</ExternalLink>.
           </p>
           <p>
-            Open source on{" "}
-            <ExternalLink href="https://github.com/robinebers/openusage">
-              GitHub
+            Original project by{" "}
+            <ExternalLink href="https://itsbyrob.in/x">Robin Ebers</ExternalLink>.
+          </p>
+          <p>
+            UsageForge source:{" "}
+            <ExternalLink href="https://github.com/dusty1505/openusage-windows-port">
+              github.com/dusty1505/openusage-windows-port
             </ExternalLink>
           </p>
-          <p className="text-xs pt-1">
-            Maintainers:{" "}
-            <ExternalLink href="https://github.com/validatedev">
-              validatedev
-            </ExternalLink>
-            ,{" "}
-            <ExternalLink href="https://github.com/davidarny">
-              davidarny
-            </ExternalLink>
-          </p>
+          <p className="text-xs pt-1">Not affiliated with or endorsed by OpenUsage.</p>
         </div>
       </div>
     </div>
